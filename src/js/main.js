@@ -16,7 +16,6 @@ function loadJSONfromfile(filename) {
     });
 }
 
-
 function readJSONfromHTML(tag_name) {
     return new Promise( function(resolve, reject) {
       try {
@@ -29,9 +28,8 @@ function readJSONfromHTML(tag_name) {
     });
   }
 
-
 function textStyle() {
-  return { font: "36pt Segoe UI,sans-serif", stroke: "black" };
+  return { font: "12pt Segoe UI,sans-serif", stroke: "black" };
 }
 
  function findimage(key) {
@@ -69,13 +67,9 @@ function traverseDom(node, parentName, dataArray) {
   return dataArray;
 }
 
-
-
 function highlightObj(obj, show) {
   obj.isHighlighted = show;
 }
-
-
 
 highlightColorIn = "blue";
 highlightColorOut = "red";
@@ -84,7 +78,6 @@ function init() {
 
   if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
   var $ = go.GraphObject.make;  // for conciseness in defining templates
-
 
     myDiagram = $(go.Diagram, "myDiagramDiv",  // must be the ID or reference to div
      {"toolManager.hoverDelay": 100,  // 100 milliseconds instead of the default 850
@@ -108,7 +101,8 @@ function init() {
   // define each Node's appearance
   myDiagram.nodeTemplate =
     $(go.Node, "Auto", // the whole node panel
-      { click : function (e, node) {
+      { isTreeExpanded: false,
+      click : function (e, node) {
         node.diagram.clearHighlighteds();
         node.findLinksInto().each(function(link) { highlightObj(link, true) });
         node.findLinksOutOf().each(function(link) { highlightObj(link, true) });
@@ -132,7 +126,7 @@ function init() {
          $(go.Picture,
            {
              name: "image",
-             desiredSize: new go.Size(400, 400),
+             desiredSize: new go.Size(100, 100),
             //  margin: new go.Margin(0, 0, 0, 0),
            },
            new go.Binding("source", "name", findimage)),
@@ -174,7 +168,7 @@ function init() {
       {
         routing: go.Link.AvoidsNodes,
         curve: go.Link.Bezier,
-        curviness: 20,
+        curviness: 0,
         click : function (e, link) {
           link.diagram.clearHighlighteds();
           if (link.fromNode != null) {
@@ -189,14 +183,13 @@ function init() {
         }
       },
       $(go.Shape,  // the link shape
-        { strokeWidth: 3,
-          stroke: "black"
+        { stroke: "black"
         },
         new go.Binding("stroke", "isHighlighted", function(h, shape) {
            return h ? highlightColorIn : shape.Rd; // DONT KNOW WHY THIS IS NOW CALLED .Rd!?!?
           }).ofObject(),
          new go.Binding("strokeWidth", "isHighlighted", function(h) {
-           return h ? 8 : 3;
+           return h ? 3 : 1;
          }).ofObject()
       ),
       $(go.Shape,  // the arrowhead
@@ -212,17 +205,16 @@ function init() {
         ),
         $(go.TextBlock, // the label text
           { background:"white",
-            font: "28pt  Segoe UI,sans-serif",
+            font: "12pt  Segoe UI,sans-serif",
             stroke: "black",
             margin: 5
           },
             new go.Binding("text", "reactant"),
-            // new go.Binding("text", "reference", function(v) {return "REF: " + v;}),
             new go.Binding("stroke", "isHighlighted", function(h, shape) {
               return h ? highlightColorIn : "black";
             }).ofObject(),
             new go.Binding("font", "isHighlighted", function(h) {
-              return h ? "52pt  Segoe UI,sans-serif" : "28pt  Segoe UI,sans-serif";
+              return h ? "18pt  Segoe UI,sans-serif" : "12pt  Segoe UI,sans-serif";
             }).ofObject()
 
          )
@@ -243,9 +235,9 @@ function init() {
       isReadOnly: true,  // don't allow the user to delete or copy nodes
       // build up the tree in an Array of node data
       nodeDataArray: traverseDom(document.activeElement)
-
     });
-  });
+});
+
 }
 
 
@@ -254,3 +246,9 @@ function init() {
 
 
 init();
+
+myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
+  e.diagram.findTreeRoots().each(function(r) {
+      r.expandTree(3);
+    });
+  });
