@@ -19,10 +19,13 @@ function loadJSONfromfile(filename) {
 
 function readJSONfromHTML(tag_name) {
     return new Promise( function(resolve, reject) {
-      jsondata = document.getElementById(tag_name).innerHTML;
-      resolve(JSON.parse(jsondata));
-
-
+      try {
+        jsondata = document.getElementById(tag_name).innerHTML;
+        resolve(JSON.parse(jsondata));
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
     });
   }
 
@@ -33,7 +36,7 @@ function textStyle() {
 
  function findimage(key) {
    try{
-     return "images/" + key + ".png"
+     return "../images/" + key + ".png"
    } catch (e){
      return false;
    }
@@ -227,14 +230,12 @@ function init() {
     );
 
 
-  // loadJSONfromfile("../data.json").then (function (jsondata) {
+  loadJSONfromfile("../data.json").then (function (jsondata) {
+  // readJSONfromHTML("data").then(function(jsondata){
 
+  nodeDataArray = jsondata['nodes'];
+  linkDataArray = jsondata['links'];
 
-
-  readJSONfromHTML("data").then(function(jsondata){
-
-  nodeDataArray = jsondata[0]['nodes'];
-  linkDataArray = jsondata[0]['links'];
 
   myDiagram.model =
     new go.GraphLinksModel(nodeDataArray, linkDataArray);

@@ -136,10 +136,8 @@ gulp.task('watch:images', function() {
 });
 
 
-
 // gulp.task('watch', ['watch:html', 'watch:css', 'watch:js', 'watch:images']);
 gulp.task('watch', ['watch:html', 'watch:css', 'watch:js']);
-
 
 
 // SERVE
